@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Aquifer — keep your valley alive for 20 years</title>
+<meta name="description" content="A groundwater simulation game built on UCSB Bren School research. Watch the water table move, see which wells fail first, and find a way to keep a valley alive for 20 years.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>The Aquifer <small>Keep your valley alive for 20 years</small></h1>
+  <div class="stats">
+    <div class="stat"><div class="k">Water table</div><div class="v" id="s-wt">0.0 m</div></div>
+    <div class="stat"><div class="k">Working wells</div><div class="v" id="s-wells">6 / 6</div></div>
+    <div class="stat"><div class="k">River</div><div class="v" id="s-river">gaining</div></div>
+    <div class="stat"><div class="k">Valley fund</div><div class="v" id="s-budget">$350k</div></div>
+  </div>
+  <button class="ghost" id="btn-research">Research behind the game</button>
+  <button class="ghost" id="btn-restart">Restart</button>
+</header>
+
+<main>
+  <div id="stage">
+    <canvas id="valley" width="1280" height="640"></canvas>
+    <div id="tip"></div>
+    <div id="legend"><span class="wt">water table now</span><span class="wt0">water table at start</span><span class="dry">dry well</span></div>
+  </div>
+
+  <aside>
+    <div class="card">
+      <div class="year"><span id="yr">2026</span><small id="yr-of">Year 1 of 20</small></div>
+      <div id="rain">Press <b>Next year</b> to see a year of rain and pumping.</div>
+      <button id="next">Next year ▶</button>
+    </div>
+
+    <div class="card">
+      <h2>Farms</h2>
+      <div id="farm-rows"></div>
+    </div>
+
+    <div class="card">
+      <h2>Wells</h2>
+      <div id="well-rows"></div>
+    </div>
+
+    <div class="card">
+      <h2>Town &amp; projects</h2>
+      <div class="row"><div class="n">Imported water for the town<small>$150k every year it is on; town pumps 70% less</small></div><button class="act" id="btn-import">Off</button></div>
+      <div class="row"><div class="n">Recharge basin, sandy site by the river<small>$200k · captures wet-year flood water</small></div><button class="act" id="btn-basin-sand">Build</button></div>
+      <div class="row"><div class="n">Recharge basin, clay-rich site<small>$120k · cheaper, but clay lets little through</small></div><button class="act" id="btn-basin-clay">Build</button></div>
+    </div>
+
+    <div class="card">
+      <h2>Policy: cap on farm pumping</h2>
+      <div class="seg" id="cap">
+        <button data-cap="1" class="on">No cap</button><button data-cap="0.8">80%</button><button data-cap="0.6">60%</button>
+      </div>
+      <div class="note" style="color:var(--muted);font-size:12px;margin-top:6px">Farms pump less and earn less; the fund's levy shrinks with them.</div>
+    </div>
+
+    <div class="card">
+      <h2>Log</h2>
+      <div id="log"></div>
+    </div>
+  </aside>
+</main>
+
+<div id="chartwrap"><canvas id="chart" width="1280" height="150"></canvas></div>
+
+<div class="modal" id="event"><div class="dialog" id="event-body"></div></div>
+
+<div class="modal" id="research"><div class="dialog">
+  <h3>Research behind the game</h3>
+  <p>This game is a simplified scenario, not a measured model of any real basin. The <b>relationships</b> below come from published research led at UC Santa Barbara's Bren School; the <b>numbers</b> in the game (well depths, pumping rates, costs, rainfall) are invented so the story plays out in 20 turns.</p>
+  <p><b>Research-backed relationships</b></p>
+  <ul>
+    <li>Pumping lowers the water table most steeply around the well that pumps, in a <i>cone of depression</i> that spreads to neighbours.</li>
+    <li>Wells fail long before an aquifer is empty. Shallower wells, often household wells, run dry first when water levels drop by only a few metres.</li>
+    <li>Groundwater declines are widespread and, in many aquifers, accelerating. Recoveries exist, and they follow deliberate interventions: alternative supplies, pumping rules, managed recharge.</li>
+    <li>Rivers and aquifers trade water. When the water table drops below the river bed, a river that once gained water from the ground starts losing water into it, and can disconnect.</li>
+    <li>Managed recharge depends on where you put it: geology, rainfall intensity and land use govern how much water actually reaches the aquifer.</li>
+  </ul>
+  <p><b>Sources</b></p>
+  <ol class="src">
+    <li>Jasechko, S. &amp; Perrone, D. (2021). Global groundwater wells at risk of running dry. <i>Science</i> 372, 418–421. <a href="https://doi.org/10.1126/science.abc2755" target="_blank" rel="noopener">doi:10.1126/science.abc2755</a></li>
+    <li>Jasechko, S., Seybold, H., Perrone, D., Fan, Y., Shamsudduha, M., Taylor, R. G., Fallatah, O. &amp; Kirchner, J. W. (2024). Rapid groundwater declines in many aquifers globally, but recoveries exist. <i>Nature</i> 625, 715–721. <a href="https://doi.org/10.1038/s41586-023-06879-8" target="_blank" rel="noopener">doi:10.1038/s41586-023-06879-8</a></li>
+    <li>Jasechko, S., Seybold, H., Perrone, D., Fan, Y. &amp; Kirchner, J. W. (2021). Widespread potential loss of streamflow into underlying aquifers across the USA. <i>Nature</i> 591, 391–395. <a href="https://doi.org/10.1038/s41586-021-03311-x" target="_blank" rel="noopener">doi:10.1038/s41586-021-03311-x</a></li>
+    <li>Jasechko, S. (2026). Review of documented groundwater recoveries (67 cases: alternative supplies, management policies, artificial recharge). <i>Science</i>, March 2026. <span class="note">Citation to be confirmed with the author.</span></li>
+    <li>California Groundwater Recharge Observatory, UCSB Marine Science Institute: how rainfall intensity, geology, land use and managed flooding shape recharge.</li>
+    <li>UCSB Groundwater Research Hub (Jasechko, Perrone and colleagues): using observational data to understand water stress and evaluate management responses.</li>
+  </ol>
+  <p class="note"><b>Invented for the game:</b> the valley, its six wells, the farms and families, all dollar figures, the rainfall sequence, the aquifer's spreading rate and specific yield, and the recharge-basin yields. These should be reviewed by Bren faculty before any classroom use.</p>
+  <div class="btns"><button class="primary" id="btn-research-close">Back to the valley</button></div>
+</div></div>
+
+<script src="sim.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
