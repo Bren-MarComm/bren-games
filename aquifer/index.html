@@ -21,10 +21,13 @@
 </header>
 
 <main>
+  <div id="left">
   <div id="stage">
     <canvas id="valley" width="1280" height="640"></canvas>
     <div id="tip"></div>
     <div id="legend"><span class="wt">water table now</span><span class="wt0">water table at start</span><span class="dry">dry well</span></div>
+  </div>
+  <div id="chartwrap"><canvas id="chart" width="1280" height="150"></canvas></div>
   </div>
 
   <aside>
@@ -65,8 +68,6 @@
     </div>
   </aside>
 </main>
-
-<div id="chartwrap"><canvas id="chart" width="1280" height="150"></canvas></div>
 
 <div class="modal" id="event"><div class="dialog" id="event-body"></div></div>
 
